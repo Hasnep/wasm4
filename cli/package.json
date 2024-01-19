@@ -45,7 +45,7 @@
     "ws": "^7.5.3"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "pkg": {
     "assets": "assets/**/*"

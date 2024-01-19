@@ -1,0 +1,6 @@
+[wasm4]
+name = "wasm4"
+relPath = "cli"
+subsystem = "nodejs"
+translator = "package-lock"
+translators = ["package-lock", "package-json"]
