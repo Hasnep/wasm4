@@ -54,6 +54,16 @@ var {{name}} = [{{length}}]byte { {{bytes}} }
 
 {{/sprites}}`,
 
+grain:
+`{{#sprites}}
+// {{name}}
+let {{name}}Width = {{width}}us
+let {{name}}Height = {{height}}us
+let {{name}}Flags = {{flags}}us // {{flagsHumanReadable}}
+let {{name}} = b"{{charBytes}}"
+
+{{/sprites}}`,
+
     nelua:
         `{{#sprites}}
 -- {{name}}
@@ -240,12 +250,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
         odinFlags = "{ .USE_2BPP }"
     }
 
-    const factor = 8 / bpp;
-    if (png.width % factor != 0) {
-        throw new Error(`${bpp}BPP sprites must have a width divisible by ${factor}`);
-    }
-
-    const bytes = new Uint8Array(png.width * png.height * bpp / 8);
+    const bytes = new Uint8Array((png.width * png.height * bpp + 7 ) / 8);
 
     // Read a color (palette index) from the source png
     function readColor(x, y) {
@@ -260,25 +265,15 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
 
     // Write a color (palette index) to the output buffer
     function writeColor(color, x, y) {
-        let idx, shift, mask;
-        switch (bpp) {
-            case 1:
-                idx = (y * png.width + x) >> 3;
-                shift = 7 - (x & 0x07);
-                mask = 0x1 << shift;
-                break;
-
-            case 2:
-                idx = (y * png.width + x) >> 2;
-                shift = 6 - ((x & 0x3) << 1);
-                mask = 0x3 << shift;
-                break;
-
-            default:
-                throw new Error("assert");
+        if(bpp != 1 && bpp != 2){
+            throw new Error("Unexpected bpp");
         }
 
-        bytes[idx] = (color << shift) | (bytes[idx] & (~mask));
+        const color_idx = (y * png.width + x);
+        const idx = Math.floor(color_idx / ( 8 / bpp ));
+        const shift = ((8 / bpp - 1)-color_idx % ( 8 / bpp )) * bpp;
+
+        bytes[idx] = (color << shift) | (bytes[idx]);
     }
 
     for (let y = 0; y < png.height; ++y) {
@@ -302,6 +297,9 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
 
     const data = dataBytes.join(',')
 
+    const charBytes = [...bytes]
+        .map((b) => "\\x" + b.toString(16).padStart(2, "0"))
+
     const wasmBytes = [...bytes]
         .map((b) => "\\" + b.toString(16).padStart(2, "0"))
 
@@ -321,6 +319,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
         "flagsHumanReadable": flagsHumanReadable,
         "bytes": data,
         "bpp": bpp,
+        "charBytes": charBytes.join(''),
         "firstByte": dataBytes[0],
         "restBytes": dataBytes.slice(1).join(','),
         "wasmBytes": wasmBytes.join(''),

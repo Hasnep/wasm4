@@ -1,9 +1,17 @@
 ---
 author: BigRobCoder
 github: BigRobCoder
-date: 2023-12-24
+date: 2024-05-15
 ---
 
-# Hero of the Woods
+# Hero of the Woods v2.1
 
-Move with the arrow keys. Grab the quest from the villager, then the indicators at the edge of the screen guide you to your target.
+Move with the arrows. The indicator on the edge of the screen points you to your next objective.
+
+Click/tap the screen to change rotation:
+
+| Option | Description |
+| ------ | ----------- |
+| AUTO | Automatically rotate to face the nearest enemy |
+| XR,ZL | X rotates clockwise, Z rotates counterclockwise |
+| ZR,XL | Z rotates clockwise, X rotates counterclockwise |

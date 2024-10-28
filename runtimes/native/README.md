@@ -19,6 +19,37 @@ cmake -B build
 cmake --build build
 ```
 
+By default, it uses [wasm3] as a WebAssembly runtime.
+Alternatively, you can use [toywasm] instead by setting
+the `WASM_BACKEND` cmake option:
+
+```shell
+cmake -B build -DWASM_BACKEND=toywasm
+cmake --build build
+```
+
+[wasm3]: https://github.com/wasm3/wasm3
+[toywasm]: https://github.com/yamt/toywasm
+
+Also, you can select the window backend by setting
+the `WINDOW_BACKEND` cmake option:
+
+```shell
+cmake -B build -DWINDOW_BACKEND=minifb
+cmake --build build
+```
+
+```shell
+cmake -B build -DWINDOW_BACKEND=glfw
+cmake --build build
+```
+
+On macOS, the default is [glfw].
+On the other platforms, the default is [minifb].
+
+[minifb]: https://github.com/emoon/minifb
+[glfw]: https://www.glfw.org/
+
 Running:
 
 ```shell

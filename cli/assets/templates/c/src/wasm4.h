@@ -18,6 +18,7 @@ WASM_EXPORT("update") void update ();
 // └───────────────────────────────────────────────────────────────────────────┘
 
 #define SCREEN_SIZE 160
+#define FONT_SIZE 8
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -117,6 +118,7 @@ void tone (uint32_t frequency, uint32_t duration, uint32_t volume, uint32_t flag
 #define TONE_MODE4 12
 #define TONE_PAN_LEFT 16
 #define TONE_PAN_RIGHT 32
+#define TONE_NOTE_MODE 64
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

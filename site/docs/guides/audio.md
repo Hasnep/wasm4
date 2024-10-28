@@ -409,6 +409,81 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
 
 </MultiLanguageCode>
 
+## Note Mode
+
+By enabling Note Mode with the `TONE_NOTE_MODE` flag, `tone` will use MIDI note numbers rather than frequencies.
+This results in more accurate pitches when playing musical notes.
+
+You can read more about how this works in the [`tone(...)` documentation](../reference/functions#tone-frequency-duration-volume-flags).
+
+Here's the same example as before, now playing middle-C using the MIDI note number 60:
+
+<MultiLanguageCode>
+
+```typescript
+w4.tone(60, 60, 100, w4.TONE_PULSE1 | w4.TONE_NOTE_MODE);
+```
+
+```c
+tone(60, 60, 100, TONE_PULSE1 | TONE_NOTE_MODE);
+```
+
+```c3
+w4::tone(60, 60, 100, w4::TONE_PULSE1 | w4::TONE_NOTE_MODE);
+```
+
+```d
+w4.tone(60, 60, 100, w4.tonePulse1 | w4.toneNoteMode);
+```
+
+```go
+w4.Tone(60, 60, 100, w4.TONE_PULSE1 | w4.TONE_NOTE_MODE)
+```
+
+```lua
+tone(60, 60, 100, TONE_PULSE1 | TONE_NOTE_MODE)
+```
+
+```nim
+tone(60, 60, 100, TONE_PULSE1 or TONE_NOTE_MODE)
+```
+
+```odin
+w4.tone(60, 60, 100, .Pulse1, .Half, .Left, .Note)
+```
+
+```penne
+tone(60, 60, 100, TONE_PULSE1 | TONE_NOTE_MODE);
+```
+
+```porth
+$TONE_NOTE_MODE $TONE_PULSE1 or 100 60 60 tone
+```
+
+```roland
+tone(60, 60, 100, TONE_PULSE1 | TONE_NOTE_MODE);
+```
+
+```rust
+tone(60, 60, 100, TONE_PULSE1 | TONE_NOTE_MODE);
+```
+
+```wasm
+(call $tone
+  (i32.const 60)
+  (i32.const 60)
+  (i32.const 100)
+  (i32.or
+    (global.get $TONE_PULSE1)
+    (global.get $TONE_NOTE_MODE)))
+```
+
+```zig
+w4.tone(60, 60, 100, w4.TONE_PULSE1 | w4.TONE_NOTE_MODE);
+```
+
+</MultiLanguageCode>
+
 ## Calculating Flags
 
 Setting ADSR flags require the use of various bitwise and bitshift operations. This can be a little confusing to understand.
@@ -501,10 +576,11 @@ fn tone_flags(channel: u32, mode: u32, pan: u32) -> u32 {
 
 ## Sound Tool
 
-The sound demo and sound test are a great way to quickly experiment with different sounds and
+The sound demo, sound test and IWAS are a great way to quickly experiment with different sounds and
 find values to plug into your game:
 
 <div className="row margin-bottom--lg">
     <PlayButton slug="sound-demo" title="Sound Demo" author="Bruno Garcia" github="aduros" colWidth="3"/>
     <PlayButton slug="sound-test" title="Sound Test" author="Mr.Rafael" github="MrRafael-dev" colWidth="3"/>
+    <PlayButton slug="iwas" title="IWAS" author="Mr.Rafael" github="MrRafael-dev" colWidth="3"/>
 </div>
