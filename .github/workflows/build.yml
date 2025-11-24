@@ -17,8 +17,7 @@ jobs:
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.dylib
 
-                    # glibc 2.31
-                    - os: ubuntu-20.04
+                    - os: ubuntu-latest
                       artifact: "linux"
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.so
@@ -39,16 +38,17 @@ jobs:
               with:
                   submodules: true
 
-            - if: matrix.config.os == 'ubuntu-20.04'
+            - if: matrix.config.os == 'ubuntu-latest'
               name: Install local dependencies
               run: |
                   ldd --version
                   sudo apt update
-                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev libasound2-dev libpulse-dev
+                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev libasound2-dev libpulse-dev libwayland-dev
 
             - name: Build
               run: |
-                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_BACKEND=${{ matrix.wasm_backend }}
+                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_BACKEND=${{ matrix.wasm_backend }} -DWINDOW_BACKEND=glfw -DGLFW_BUILD_WAYLAND=ON -DGLFW_BUILD_X11=ON
+
                   cmake --build build --config Release --parallel
 
             - name: Install
@@ -136,6 +136,21 @@ jobs:
               with:
                   path: cli-build
                   name: w4
+
+    netlify-ci:
+        name: Run Netlify CI
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: true
+
+            - name: Run Netlify CI script
+              run: |
+                  scripts/run-netlify-ci
+              env:
+                  NODE_OPTIONS: --openssl-legacy-provider
 
     release:
         if: startsWith(github.ref, 'refs/tags/v')

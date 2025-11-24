@@ -5,6 +5,7 @@ import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor } from "./compositor";
 import * as devkit from "./devkit";
 import { wasmPatchExportGlobals } from "./wasm-patch";
+import * as configConstants from "./config-constants";
 
 export class Runtime {
     canvas: HTMLCanvasElement;
@@ -18,6 +19,7 @@ export class Runtime {
     wasmBufferByteLen: number;
     wasm: WebAssembly.Instance | null = null;
     warnedFileSize = false;
+    playerIdx : number;
 
     diskName: string;
     diskBuffer: ArrayBuffer;
@@ -65,6 +67,7 @@ export class Runtime {
         this.reset();
 
         this.pauseState = 0;
+        this.playerIdx = 0;
         this.wasmBufferByteLen = 0;
     }
 
@@ -84,6 +87,7 @@ export class Runtime {
 
     setNetplay (localPlayerIdx: number) {
         this.data.setUint8(constants.ADDR_NETPLAY, 0b100 | (localPlayerIdx & 0b11));
+        this.playerIdx = localPlayerIdx;
     }
 
     getSystemFlag (mask: number) {
@@ -120,7 +124,7 @@ export class Runtime {
         this.wasm = null;
 
         if (wasmBuffer.byteLength > limit) {
-            if (constants.GAMEDEV_MODE) {
+            if (configConstants.GAMEDEV_MODE) {
                 if (!this.warnedFileSize) {
                     this.warnedFileSize = true;
                     this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);
@@ -230,15 +234,20 @@ export class Runtime {
         const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
         const dest = new Uint8Array(this.diskBuffer);
 
-        // Try to save to localStorage
-        const str = z85.encode(src);
-        try {
-            localStorage.setItem(this.diskName, str);
-        } catch (error) {
-            // TODO(2022-02-13): Show a warning to the user that storage is not persisted
-            console.error("Error writing disk", error);
+        // save to localStorage only for the hosting player. (index 0)
+        // as the disk buffer is a part of the shared state provided by
+        // the hosting player, don't risk overwriting the local data
+        // for others.
+        if (this.playerIdx == 0) {
+            // Try to save to localStorage
+            const str = z85.encode(src);
+            try {
+                localStorage.setItem(this.diskName, str);
+            } catch (error) {
+                // TODO(2022-02-13): Show a warning to the user that storage is not persisted
+                console.error("Error writing disk", error);
+            }
         }
-
         dest.set(src);
         this.diskSize = bytesWritten;
         return bytesWritten;
@@ -262,8 +271,8 @@ export class Runtime {
     }
 
     printToServer (str: string) {
-        if (devkit.websocket != null && devkit.websocket.readyState == 1) {
-            devkit.websocket.send(str);
+        if (devkit.cli_websocket != null && devkit.cli_websocket.readyState == 1) {
+            devkit.cli_websocket.send(str);
         }
     }
 
